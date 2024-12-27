@@ -9,15 +9,24 @@ macro_rules! define_address {
     };
 }
 
-define_address!(RELIC_BASE_ADDR,0x183174940);
-define_address!(BOSSRECORD_BASE_ADDR,0x183173C30);
-define_address!(BOSS_HP_ADDR,0x183152B00);
-define_address!(MAP_X_ADDR,0x19316AFAF);
-define_address!(MAP_Y_ADDR,0x18316AFB3);
-define_address!(TIME_HOURS_ADDR,0x182E7F507);
-define_address!(TIME_MINS_ADDR,0x182E7F505);
-define_address!(TIME_SECS_ADDR,0x182E7F503);
-define_address!(TIME_FRAMES_ADDR,0x182E7F501);
+macro_rules! define_offset_addr {
+    ($name:ident, $off:expr) => {
+        pub const $name: u64 = $off - 0x182E7B284; //constant from pre-title update, changes after
+    };
+}
+
+define_address!(DATA_START_PTR, 0x182896078);
+
+
+define_offset_addr!(RELIC_BASE_ADDR,0x183174940);
+define_offset_addr!(BOSSRECORD_BASE_ADDR,0x183173C30);
+define_offset_addr!(BOSS_HP_ADDR,0x183152B00);
+define_offset_addr!(MAP_X_ADDR,0x19316AFAF);
+define_offset_addr!(MAP_Y_ADDR,0x18316AFB3);
+define_offset_addr!(TIME_HOURS_ADDR,0x182E7F507);
+define_offset_addr!(TIME_MINS_ADDR,0x182E7F505);
+define_offset_addr!(TIME_SECS_ADDR,0x182E7F503);
+define_offset_addr!(TIME_FRAMES_ADDR,0x182E7F501);
 
 #[derive(Default)]
 pub struct GameState {

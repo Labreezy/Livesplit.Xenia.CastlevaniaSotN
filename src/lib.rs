@@ -21,16 +21,15 @@ asr::panic_handler!();
 async fn main() {
     let mut settings = settings::Settings::register();
     let mut custom_vars = auto_splitter_startup();
-    asr::set_tick_rate(60.0);
+    asr::set_tick_rate(30.0);
     loop {
         let process = retry(|| Process::attach("xenia_canary.exe")).await;
         print_message("Process found!");
-        process
-            .until_closes(async {
+        let future = async {
                 loop {
                 
                 auto_splitter_init(&settings);
-
+        
                 let mut game_state = GameState::default();
                 
                 loop {
@@ -48,7 +47,7 @@ async fn main() {
                             }
                         };
                     }
-
+        
                     macro_rules! unwrap_or_next_tick_res {
                         ( $e:expr, $s:expr ) => {
                             match $e {
@@ -61,7 +60,7 @@ async fn main() {
                             }
                         };
                     }
-
+        
                     macro_rules! read_mem {
                         ( $name:ident, $addr:expr, $t:ty) => {
                             let $name = *unwrap_or_next_tick_opt!(
@@ -87,17 +86,32 @@ async fn main() {
                             );
                         };
                     }
-
+                    let base_ptr: u32 = unwrap_or_next_tick_res!(
+                        process.read::<u32>(DATA_START_PTR),
+                    &format_args!("Failed reading base pointer"));
                     
-                        read_mem!(map_x, MAP_X_ADDR, u8);
-                        read_mem!(map_y, MAP_Y_ADDR, u8);
-                        read_mem!(relic_vals, RELIC_BASE_ADDR, [u8; 28]);
-                        read_mem!(bossrecord_vals, BOSSRECORD_BASE_ADDR, [u32; 26]);
-                        read_mem_and_map!(boss_hp, BOSS_HP_ADDR, u32, |value: u32| {value.from_be()});
-                        read_mem!(time_hours, TIME_HOURS_ADDR, u8);
-                        read_mem!(time_mins, TIME_MINS_ADDR, u8);
-                        read_mem!(time_secs, TIME_SECS_ADDR, u8);
-                        read_mem!(time_frames, TIME_FRAMES_ADDR, u8);
+                    let data_start_addr: u64  = 0x100000000u64 + base_ptr.from_be() as u64;
+                    let data_start: Address = Address::new(data_start_addr);
+                    
+                    macro_rules! read_offset_mem {
+                        ($name:ident, $off:expr, $t:ty) => {
+                            read_mem!($name, data_start.add($off), $t);
+                        };
+                    }
+                    macro_rules! read_offset_mem_and_map {
+                        ( $name:ident, $off:expr, $t:ty, $mapper:expr) => {
+                            read_mem_and_map!($name, data_start.add($off), $t, $mapper);
+                        };
+                    }
+                        read_offset_mem!(map_x, MAP_X_ADDR, u8);
+                        read_offset_mem!(map_y, MAP_Y_ADDR, u8);
+                        read_offset_mem!(relic_vals, RELIC_BASE_ADDR, [u8; 28]);
+                        read_offset_mem!(bossrecord_vals, BOSSRECORD_BASE_ADDR, [u32; 26]);
+                        read_offset_mem_and_map!(boss_hp, BOSS_HP_ADDR, u32, |value: u32| {value.from_be()});
+                        read_offset_mem!(time_hours, TIME_HOURS_ADDR, u8);
+                        read_offset_mem!(time_mins, TIME_MINS_ADDR, u8);
+                        read_offset_mem!(time_secs, TIME_SECS_ADDR, u8);
+                        read_offset_mem!(time_frames, TIME_FRAMES_ADDR, u8);
                         
                         let vars = GameStatePair {
                             relic_vals, bossrecord_vals, boss_hp, map_x, map_y, time_hours, time_mins, time_secs, time_frames
@@ -108,6 +122,8 @@ async fn main() {
                     next_tick().await;
                     }
                 }
-            }).await;
+            };
+        process
+            .until_closes(future).await;
     }
 }

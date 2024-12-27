@@ -103,7 +103,7 @@ pub fn auto_splitter_start(
     
 
 
-    let richter_control_start = vars.time_hours.current == 0 && vars.time_mins.current == 0 && vars.time_secs.current == 0 && vars.time_frames.current > 10;
+    let richter_control_start = vars.time_hours.current == 0 && vars.time_mins.current == 0 && vars.time_secs.current == 3;
 
     return richter_control_start;
 }
