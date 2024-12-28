@@ -107,7 +107,7 @@ async fn main() {
                         read_offset_mem!(map_y, MAP_Y_ADDR, u8);
                         read_offset_mem!(relic_vals, RELIC_BASE_ADDR, [u8; 28]);
                         read_offset_mem!(bossrecord_vals, BOSSRECORD_BASE_ADDR, [u32; 26]);
-                        read_offset_mem_and_map!(boss_hp, BOSS_HP_ADDR, u32, |value: u32| {value.from_be()});
+                        read_offset_mem_and_map!(boss_hp, BOSS_HP_ADDR, i16, |value: i16| {value.from_be()});
                         read_offset_mem!(time_hours, TIME_HOURS_ADDR, u8);
                         read_offset_mem!(time_mins, TIME_MINS_ADDR, u8);
                         read_offset_mem!(time_secs, TIME_SECS_ADDR, u8);

@@ -4,7 +4,8 @@ use asr::{print_message, timer::{self, TimerState}};
 pub struct CustomVars {
     relic_split_mask: [bool; 28],
     boss_split_mask: [bool; 26],
-    dracula_started: bool
+    dracula_started: bool,
+    dracula_split: bool,
 }
 
 pub fn auto_splitter_startup() -> CustomVars {
@@ -13,7 +14,8 @@ pub fn auto_splitter_startup() -> CustomVars {
     CustomVars { 
         relic_split_mask: core::array::from_fn(|_| false), 
         boss_split_mask: core::array::from_fn(|_| false), 
-        dracula_started: false 
+        dracula_started: false,
+        dracula_split: false,
     }
 }
 
@@ -103,7 +105,7 @@ pub fn auto_splitter_start(
     
 
 
-    let richter_control_start = vars.time_hours.current == 0 && vars.time_mins.current == 0 && vars.time_secs.current == 3;
+    let richter_control_start = vars.time_hours.current == 0 && vars.time_mins.current == 0 && vars.time_secs.current == 2 && vars.time_frames.current < 5;
 
     return richter_control_start;
 }
@@ -121,8 +123,14 @@ pub fn auto_splitter_split(
         };
     }
 
-    if settings.dracula_end {
-        split_if_true!(custom_vars.dracula_started && vars.boss_hp.old < 9999 && vars.boss_hp.current < 1 && vars.map_x.current == 31 && vars.map_y.current == 30);
+    if settings.dracula_end && !custom_vars.dracula_split {
+
+        if custom_vars.dracula_started && 
+        vars.boss_hp.old < 9999 && vars.boss_hp.old > 0 && 
+        vars.boss_hp.current < 1 && vars.map_x.current == 31 && vars.map_y.current == 30 {
+            custom_vars.dracula_split = true;
+            return true;
+        }
     }
 
     for i in 0..custom_vars.relic_split_mask.len(){
@@ -141,7 +149,7 @@ pub fn auto_splitter_split(
                 print_message("Boss Record Split");
                 return true;
             }
-    }
+    }   
     return false;
 }
 
@@ -150,7 +158,7 @@ pub fn auto_splitter_update(
     custom_vars: &mut CustomVars,
     _settings: &Settings
 ) {
-    if vars.boss_hp.current == 10000 && vars.map_x.current == 31 && vars.map_x.current == 30 {
+    if vars.boss_hp.current == 10000 && vars.map_x.current == 31 && vars.map_y.current == 30 {
         if !custom_vars.dracula_started {
             print_message("Dracula Fight Started");
             custom_vars.dracula_started = true;
