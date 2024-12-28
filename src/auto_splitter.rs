@@ -152,7 +152,7 @@ pub fn auto_splitter_split(
         }
     }
 
-    if vars.second_castle.changed_from(&0){
+    if settings.second_castle && vars.second_castle.changed_from(&0){
         return true;
     }
     for i in 0..custom_vars.relic_split_mask.len(){
