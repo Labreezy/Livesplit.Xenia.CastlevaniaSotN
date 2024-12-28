@@ -112,9 +112,9 @@ async fn main() {
                         read_offset_mem!(time_mins, TIME_MINS_ADDR, u8);
                         read_offset_mem!(time_secs, TIME_SECS_ADDR, u8);
                         read_offset_mem!(time_frames, TIME_FRAMES_ADDR, u8);
-                        
+                        read_offset_mem!(second_castle, SECOND_CASTLE_ADDR, u8);
                         let vars = GameStatePair {
-                            relic_vals, bossrecord_vals, boss_hp, map_x, map_y, time_hours, time_mins, time_secs, time_frames
+                            relic_vals, bossrecord_vals, boss_hp, map_x, map_y, time_hours, time_mins, time_secs, time_frames, second_castle
                         };
                         auto_splitter_loop(&vars, &mut custom_vars, &settings);
                    

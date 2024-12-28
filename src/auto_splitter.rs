@@ -3,19 +3,25 @@ use crate::{settings::Settings};
 use asr::{print_message, timer::{self, TimerState}};
 pub struct CustomVars {
     relic_split_mask: [bool; 28],
+    has_relic_split: [bool; 28],
     boss_split_mask: [bool; 26],
     dracula_started: bool,
     dracula_split: bool,
+    shaft_started: bool,
+    shaft_split: bool,
 }
 
 pub fn auto_splitter_startup() -> CustomVars {
     print_message("SotN Xenia Autosplitter - Loaded, waiting for xenia");
 
     CustomVars { 
-        relic_split_mask: core::array::from_fn(|_| false), 
+        relic_split_mask: core::array::from_fn(|_| false),
+        has_relic_split: core::array::from_fn(|_| false), 
         boss_split_mask: core::array::from_fn(|_| false), 
         dracula_started: false,
         dracula_split: false,
+        shaft_split: false,
+        shaft_started: false
     }
 }
 
@@ -30,7 +36,11 @@ pub fn auto_splitter_start(
     settings: &Settings
 ) -> bool {
     custom_vars.dracula_started = false;
-    
+    custom_vars.dracula_split = false;
+    custom_vars.shaft_split = false;
+    custom_vars.shaft_started = false;
+    custom_vars.has_relic_split = core::array::from_fn(|_| false);
+
     macro_rules! set_relic_mask_if_setting {
         ( $setting:ident, $number:expr ) => {
             if settings.$setting {
@@ -103,7 +113,7 @@ pub fn auto_splitter_start(
     set_boss_mask_if_setting!(meet_librarian, 24);
     set_boss_mask_if_setting!(meet_maria, 25);
     
-
+    
 
     let richter_control_start = vars.time_hours.current == 0 && vars.time_mins.current == 0 && vars.time_secs.current == 2 && vars.time_frames.current < 5;
 
@@ -123,6 +133,15 @@ pub fn auto_splitter_split(
         };
     }
 
+    if settings.shaft && !custom_vars.shaft_split {
+        if custom_vars.shaft_started &&
+        vars.boss_hp.old < 1300 && vars.boss_hp.old > 0 &&
+        vars.boss_hp.current < 1 && vars.map_x.current == 31 && vars.map_y.current == 32 {
+            custom_vars.shaft_split = true;
+            return true;
+        }
+    }
+
     if settings.dracula_end && !custom_vars.dracula_split {
 
         if custom_vars.dracula_started && 
@@ -133,12 +152,18 @@ pub fn auto_splitter_split(
         }
     }
 
+    if vars.second_castle.changed_from(&0){
+        return true;
+    }
     for i in 0..custom_vars.relic_split_mask.len(){
         if custom_vars.relic_split_mask[i]
             && (vars.relic_vals.current[i] == 3 && vars.relic_vals.old[i] != 3)
             {
-                print_message("Relic split");
-                return true;
+                if !custom_vars.has_relic_split[i]{
+                    print_message("Relic split");
+                    custom_vars.has_relic_split[i] = true;
+                    return true;
+                }
             }
     }
 
@@ -149,7 +174,8 @@ pub fn auto_splitter_split(
                 print_message("Boss Record Split");
                 return true;
             }
-    }   
+    }
+       
     return false;
 }
 
@@ -158,6 +184,13 @@ pub fn auto_splitter_update(
     custom_vars: &mut CustomVars,
     _settings: &Settings
 ) {
+    if vars.boss_hp.current == 1300 && vars.map_x.current == 31 && vars.map_y.current == 32 {
+        if !custom_vars.shaft_started {
+            print_message("Shaft Fight Started");
+            custom_vars.shaft_started = true;
+        }
+
+    }
     if vars.boss_hp.current == 10000 && vars.map_x.current == 31 && vars.map_y.current == 30 {
         if !custom_vars.dracula_started {
             print_message("Dracula Fight Started");

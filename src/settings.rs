@@ -4,6 +4,11 @@ use asr::settings::gui::Title;
 
 #[derive(Gui)]
 pub struct Settings {
+
+    ///Second Castle
+    #[default=false]
+    pub second_castle: bool,
+
     ///Bosses
     _bosses: Title,
 
@@ -67,7 +72,6 @@ pub struct Settings {
     //Akmodan
     #[default=false]
     pub akmodan: bool,
-
     ///Darkwing Bat
     #[default=false]
     pub darkwing_bat: bool,
@@ -86,6 +90,9 @@ pub struct Settings {
     //Meet Maria
     #[default=false]
     pub meet_maria: bool,
+    ///Shaft
+    #[default=false]
+    pub shaft: bool,
     ///Dracula
     #[default=true]
     pub dracula_end: bool,

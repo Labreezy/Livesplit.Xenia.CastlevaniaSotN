@@ -27,6 +27,7 @@ define_offset_addr!(TIME_HOURS_ADDR,0x182E7F507);
 define_offset_addr!(TIME_MINS_ADDR,0x182E7F505);
 define_offset_addr!(TIME_SECS_ADDR,0x182E7F503);
 define_offset_addr!(TIME_FRAMES_ADDR,0x182E7F501);
+define_offset_addr!(SECOND_CASTLE_ADDR,0x183162358);
 
 #[derive(Default)]
 pub struct GameState {
@@ -39,6 +40,7 @@ pub struct GameState {
     pub time_mins: Watcher<u8>,
     pub time_secs: Watcher<u8>,
     pub time_frames: Watcher<u8>,
+    pub second_castle: Watcher<u8>,
 }
 
 #[derive()]
@@ -52,4 +54,5 @@ pub struct GameStatePair {
     pub time_mins: Pair<u8>,
     pub time_secs: Pair<u8>,
     pub time_frames: Pair<u8>,
+    pub second_castle: Pair<u8>,
 }
