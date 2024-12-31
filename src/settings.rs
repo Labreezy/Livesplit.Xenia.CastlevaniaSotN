@@ -9,6 +9,14 @@ pub struct Settings {
     #[default=false]
     pub second_castle: bool,
 
+    ///Clock Rush
+    #[default=false]
+    pub clock_rush: bool,
+
+    ///Library to Outer Wall
+    #[default=false]
+    pub library_outer_wall: bool,
+
     ///Bosses
     _bosses: Title,
 

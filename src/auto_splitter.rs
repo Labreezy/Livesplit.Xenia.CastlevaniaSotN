@@ -1,5 +1,5 @@
 use super::state::GameStatePair;
-use crate::{settings::Settings};
+use crate::{settings::Settings, LocationPair};
 use asr::{print_message, timer::{self, TimerState}};
 pub struct CustomVars {
     relic_split_mask: [bool; 28],
@@ -9,7 +9,13 @@ pub struct CustomVars {
     dracula_split: bool,
     shaft_started: bool,
     shaft_split: bool,
+    clockrush_loc: LocationPair,
+    library_outerwall_loc: LocationPair,
 }
+
+
+
+
 
 pub fn auto_splitter_startup() -> CustomVars {
     print_message("SotN Xenia Autosplitter - Loaded, waiting for xenia");
@@ -21,7 +27,26 @@ pub fn auto_splitter_startup() -> CustomVars {
         dracula_started: false,
         dracula_split: false,
         shaft_split: false,
-        shaft_started: false
+        shaft_started: false,
+        clockrush_loc: LocationPair {
+            enabled: false,
+            has_split: false,
+            second_castle: false,
+            old_x: 32,
+            old_y: 26,
+            new_x: 32,
+            new_y: 24,
+        },
+        library_outerwall_loc: LocationPair {
+            enabled: false,
+            has_split: false,
+            second_castle: false,
+            old_x: 59,
+            old_y: 21,
+            new_x: 60,
+            new_y: 15,
+        },
+        
     }
 }
 
@@ -40,6 +65,12 @@ pub fn auto_splitter_start(
     custom_vars.shaft_split = false;
     custom_vars.shaft_started = false;
     custom_vars.has_relic_split = core::array::from_fn(|_| false);
+    
+    custom_vars.clockrush_loc.enabled = settings.clock_rush;
+    custom_vars.clockrush_loc.has_split = false;
+    custom_vars.library_outerwall_loc.enabled = settings.library_outer_wall;
+    custom_vars.library_outerwall_loc.has_split = false;
+
 
     macro_rules! set_relic_mask_if_setting {
         ( $setting:ident, $number:expr ) => {
@@ -120,19 +151,39 @@ pub fn auto_splitter_start(
     return richter_control_start;
 }
 
+
+fn location_change_split(
+    vars: &GameStatePair,
+    loc_pair: &mut LocationPair
+) -> bool {
+    if !loc_pair.enabled {
+        return false;
+    }
+    let is_second_castle = vars.second_castle.current > 0;
+    if is_second_castle != loc_pair.second_castle || loc_pair.has_split {
+        return false;
+    }
+    if vars.map_x.changed_from_to(&loc_pair.old_x, &loc_pair.new_x) && vars.map_y.changed_from_to(&loc_pair.old_y, &loc_pair.new_y){
+        loc_pair.has_split = true;
+        return true;
+    }
+    false
+}
+
 pub fn auto_splitter_split(
     vars: &GameStatePair,
     custom_vars: &mut CustomVars,
     settings: &Settings
 ) -> bool {
-    macro_rules! split_if_true {
-        ( $e:expr ) => {
-            if $e {
-                return true;
-            }
-        };
-    }
+    
 
+    //Locations
+    if settings.clock_rush && location_change_split(vars, &mut custom_vars.clockrush_loc){
+        return true;
+    }
+    if settings.library_outer_wall && location_change_split(vars, &mut custom_vars.library_outerwall_loc){
+        return true;
+    }
     if settings.shaft && !custom_vars.shaft_split {
         if custom_vars.shaft_started &&
         vars.boss_hp.old < 1300 && vars.boss_hp.old > 0 &&
@@ -176,7 +227,7 @@ pub fn auto_splitter_split(
             }
     }
        
-    return false;
+    false
 }
 
 pub fn auto_splitter_update(

@@ -15,9 +15,21 @@ macro_rules! define_offset_addr {
     };
 }
 
+#[derive(Default, Clone, Copy)]
+pub struct LocationPair {
+    pub enabled: bool,
+    pub has_split: bool,
+    pub second_castle: bool,
+    pub old_x: u8,
+    pub old_y: u8,
+    pub new_x: u8,
+    pub new_y: u8,
+}
+
+
+
+
 define_address!(DATA_START_PTR, 0x182896078);
-
-
 define_offset_addr!(RELIC_BASE_ADDR,0x183174940);
 define_offset_addr!(BOSSRECORD_BASE_ADDR,0x183173C30);
 define_offset_addr!(BOSS_HP_ADDR,0x183152B02);
