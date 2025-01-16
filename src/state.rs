@@ -11,7 +11,7 @@ macro_rules! define_address {
 
 macro_rules! define_offset_addr {
     ($name:ident, $off:expr) => {
-        pub const $name: u64 = $off - 0x182E7B284; //constant from pre-title update, changes after
+        pub const $name: u64 = $off - 0x82E7B284; //constant from pre-title update, changes after
     };
 }
 
@@ -27,19 +27,18 @@ pub struct LocationPair {
 }
 
 
-
-
-define_address!(DATA_START_PTR, 0x182896078);
-define_offset_addr!(RELIC_BASE_ADDR,0x183174940);
-define_offset_addr!(BOSSRECORD_BASE_ADDR,0x183173C30);
-define_offset_addr!(BOSS_HP_ADDR,0x183152B02);
-define_offset_addr!(MAP_X_ADDR,0x19316AFAF);
-define_offset_addr!(MAP_Y_ADDR,0x18316AFB3);
-define_offset_addr!(TIME_HOURS_ADDR,0x182E7F507);
-define_offset_addr!(TIME_MINS_ADDR,0x182E7F505);
-define_offset_addr!(TIME_SECS_ADDR,0x182E7F503);
-define_offset_addr!(TIME_FRAMES_ADDR,0x182E7F501);
-define_offset_addr!(SECOND_CASTLE_ADDR,0x183162358);
+pub static DATA_START_OFFSET: u64 = 0x82896078;
+//define_address!(DATA_START_PTR, 0x182896078);
+define_offset_addr!(RELIC_BASE_ADDR,0x83174940);
+define_offset_addr!(BOSSRECORD_BASE_ADDR,0x83173C30);
+define_offset_addr!(BOSS_HP_ADDR,0x83152B02);
+define_offset_addr!(MAP_X_ADDR,0x8316AFAF);
+define_offset_addr!(MAP_Y_ADDR,0x8316AFB3);
+define_offset_addr!(TIME_HOURS_ADDR,0x82E7F507);
+define_offset_addr!(TIME_MINS_ADDR,0x82E7F505);
+define_offset_addr!(TIME_SECS_ADDR,0x82E7F503);
+define_offset_addr!(TIME_FRAMES_ADDR,0x82E7F501);
+define_offset_addr!(SECOND_CASTLE_ADDR,0x83162358);
 
 #[derive(Default)]
 pub struct GameState {
