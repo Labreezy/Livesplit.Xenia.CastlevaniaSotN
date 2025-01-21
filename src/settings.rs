@@ -133,7 +133,7 @@ pub struct Settings {
     ///Form of Mist
     #[default=false]
     pub form_mist: bool,
-    //Power of Mist
+    ///Power Of Mist
     #[default=false]
     pub power_mist: bool,
     //Gas Cloud

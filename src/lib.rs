@@ -48,7 +48,7 @@ fn find_xenia_start(process: &Process) -> Option<Address> {
                         
                         continue;
                     };
-                     //0x4450 = PE
+                     //0x4550 = PE
                     if pe_ok == 0x4550 {
                         ram_base = Address::new(tempaddr);
                         print_limited::<128>(&format_args!("RAM Base found at 0x{:X}", ram_base.value()));

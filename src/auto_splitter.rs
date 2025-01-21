@@ -146,7 +146,7 @@ pub fn auto_splitter_start(
     
     
 
-    let richter_control_start = vars.time_hours.current == 0 && vars.time_mins.current == 0 && vars.time_secs.current == 2 && vars.time_frames.current < 5;
+    let richter_control_start = vars.time_hours.current == 0 && vars.time_mins.current == 0 && vars.time_secs.current == 2 && vars.time_frames.current >= 14;
 
     return richter_control_start;
 }
